@@ -38,7 +38,7 @@
 
     .container {
       width: 100%;
-      max-width: 840px;
+      max-width: 860px;
     }
 
     .top-bar {
@@ -103,7 +103,8 @@
     }
 
     input[type="text"],
-    input[type="file"] {
+    input[type="file"],
+    select {
       width: 100%;
       padding: 0.75rem 1rem;
       border: 1px solid var(--border);
@@ -113,7 +114,8 @@
       background: #fff;
     }
 
-    input[type="text"]:focus {
+    input[type="text"]:focus,
+    select:focus {
       border-color: var(--primary);
     }
 
@@ -299,7 +301,14 @@
     <div id="auth-panel" class="card">
       <div class="header-tag">COURSE CODE: CAP392</div>
       <h1>Practical Assignment: Java</h1>
-      <p>Enter your credentials to get your categorized set allocation.</p>
+      <p>Select your assigned continuous evaluation task and verify your credentials.</p>
+
+      <div class="form-group">
+        <label for="student-ca-select">Select Assessment</label>
+        <select id="student-ca-select">
+          <option value="CA1">Loading available assessments...</option>
+        </select>
+      </div>
 
       <div class="form-group">
         <label for="regNo">Registration Number</label>
@@ -314,8 +323,8 @@
 
     <!-- Step 2: Instructions Panel -->
     <div id="instructions-panel" class="card hidden">
-      <div class="header-tag">COURSE CODE: CAP392</div>
-      <h2>General Instructions &amp; Timing</h2>
+      <div class="header-tag" id="ca-inst-tag">COURSE CODE: CAP392</div>
+      <h2 id="ca-inst-title">General Instructions &amp; Timing</h2>
 
       <div class="alert-box">
         <strong>Time Allowed:</strong> 40 minutes total (20 minutes per question).
@@ -323,9 +332,8 @@
 
       <ul>
         <li><strong>Attempt any TWO questions</strong> from your allocated set.</li>
-        <li><strong>Selection Requirement:</strong> Check the boxes for the 2 questions you are attempting and click
-          <strong>Save Selection to Sheet</strong>.
-        </li>
+        <li><strong>Selection Requirement:</strong> You must check the boxes for the 2 questions you are attempting and
+          click <strong>Save Selection to Sheet</strong> to record your choices.</li>
         <li><strong>Use multiple classes</strong> wherever specified in the problem statement.</li>
         <li><strong>Dynamic Input:</strong> Take all required input from the user using <code>Scanner</code>.</li>
         <li><strong>Control Structures:</strong> Implement the appropriate control logic (if-else, switch, loops).</li>
@@ -340,6 +348,7 @@
       <div class="card">
         <div class="badge-bar">
           <span class="badge" id="display-course">Course: CAP392</span>
+          <span class="badge" id="display-ca"></span>
           <span class="badge" id="display-name"></span>
           <span class="badge" id="display-reg"></span>
           <span class="badge" id="display-group"></span>
@@ -349,270 +358,8 @@
         <p>Select <strong>exactly 2 questions</strong> below, then click "Save Selection to Sheet" to confirm.</p>
       </div>
 
-      <!-- Set 1 -->
-      <div id="set-1" class="set-content hidden">
-        <div class="question-card" data-q="Q1">
-          <div class="question-select-header">
-            <input type="checkbox" id="s1-q1" value="Q1" class="q-checkbox" />
-            <label for="s1-q1">
-              <h3>Q1. Student Result System</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Student</code> and <code>Result</code>.</p>
-          <p><strong>Student class stores:</strong> Student name, Roll number, Marks of 3 subjects.</p>
-          <p><strong>Result class calculates &amp; displays:</strong> Total marks, Percentage, and Pass/Fail (Pass only
-            if &ge; 40 marks in each subject).</p>
-        </div>
-
-        <div class="question-card" data-q="Q2">
-          <div class="question-select-header">
-            <input type="checkbox" id="s1-q2" value="Q2" class="q-checkbox" />
-            <label for="s1-q2">
-              <h3>Q2. Electricity Bill Calculator</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Customer</code> and <code>ElectricityBill</code>.</p>
-          <p><strong>Customer class stores:</strong> Customer name, Customer ID, Units consumed.</p>
-          <table>
-            <thead>
-              <tr>
-                <th>Units Consumed</th>
-                <th>Rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>0 – 100</td>
-                <td>₹2 / unit</td>
-              </tr>
-              <tr>
-                <td>101 – 200</td>
-                <td>₹3 / unit</td>
-              </tr>
-              <tr>
-                <td>201 – 300</td>
-                <td>₹5 / unit</td>
-              </tr>
-              <tr>
-                <td>Above 300</td>
-                <td>₹7 / unit</td>
-              </tr>
-            </tbody>
-          </table>
-          <p>Display customer's name, units consumed, and total bill.</p>
-        </div>
-
-        <div class="question-card" data-q="Q3">
-          <div class="question-select-header">
-            <input type="checkbox" id="s1-q3" value="Q3" class="q-checkbox" />
-            <label for="s1-q3">
-              <h3>Q3. Employee Salary Calculator</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Employee</code> and <code>Salary</code>.</p>
-          <p>Take Employee name, Employee ID, Basic salary. Calculate:</p>
-          <ul>
-            <li>HRA = 20% of basic salary</li>
-            <li>DA = 10% of basic salary</li>
-            <li>Gross Salary = Basic + HRA + DA</li>
-          </ul>
-          <p>If Gross &gt; ₹50,000 &rarr; "High Salary", else &rarr; "Normal Salary".</p>
-        </div>
-
-        <div class="question-card" data-q="Q4">
-          <div class="question-select-header">
-            <input type="checkbox" id="s1-q4" value="Q4" class="q-checkbox" />
-            <label for="s1-q4">
-              <h3>Q4. ATM Withdrawal System</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Account</code> and <code>ATM</code>.</p>
-          <p>Take account holder name, account number, account balance, and withdrawal amount. Check:</p>
-          <ul>
-            <li>Amount &gt; balance &rarr; "Insufficient Balance"</li>
-            <li>Amount not multiple of ₹100 &rarr; "Enter amount in multiples of 100"</li>
-            <li>Otherwise &rarr; perform withdrawal and display remaining balance</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Set 2 -->
-      <div id="set-2" class="set-content hidden">
-        <div class="question-card" data-q="Q1">
-          <div class="question-select-header">
-            <input type="checkbox" id="s2-q1" value="Q1" class="q-checkbox" />
-            <label for="s2-q1">
-              <h3>Q1. Shopping Discount System</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Customer</code> and <code>Shopping</code>.</p>
-          <p>Take customer name and total shopping amount. Apply discount:</p>
-          <table>
-            <thead>
-              <tr>
-                <th>Shopping Amount</th>
-                <th>Discount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Below ₹5,000</td>
-                <td>No discount</td>
-              </tr>
-              <tr>
-                <td>₹5,000 – ₹9,999</td>
-                <td>10%</td>
-              </tr>
-              <tr>
-                <td>₹10,000 – ₹19,999</td>
-                <td>15%</td>
-              </tr>
-              <tr>
-                <td>₹20,000 or above</td>
-                <td>20%</td>
-              </tr>
-            </tbody>
-          </table>
-          <p>Display Customer name, Shopping amount, Discount, and Final amount.</p>
-        </div>
-
-        <div class="question-card" data-q="Q2">
-          <div class="question-select-header">
-            <input type="checkbox" id="s2-q2" value="Q2" class="q-checkbox" />
-            <label for="s2-q2">
-              <h3>Q2. Employee Attendance System</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Employee</code> and <code>Attendance</code>.</p>
-          <p>Take Name, ID, Total working days, and Days present. Calculate attendance percentage:</p>
-          <ul>
-            <li>80% or above &rarr; "Good Attendance"</li>
-            <li>60% to below 80% &rarr; "Average Attendance"</li>
-            <li>Below 60% &rarr; "Poor Attendance"</li>
-          </ul>
-        </div>
-
-        <div class="question-card" data-q="Q3">
-          <div class="question-select-header">
-            <input type="checkbox" id="s2-q3" value="Q3" class="q-checkbox" />
-            <label for="s2-q3">
-              <h3>Q3. Restaurant Billing System</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Customer</code> and <code>Restaurant</code>.</p>
-          <p>Use switch to select: 1. Pizza (₹250), 2. Burger (₹150), 3. Sandwich (₹100), 4. Coffee (₹80).</p>
-          <p>Take item and quantity. If bill &gt; ₹1,000, apply a 10% discount.</p>
-        </div>
-
-        <div class="question-card" data-q="Q4">
-          <div class="question-select-header">
-            <input type="checkbox" id="s2-q4" value="Q4" class="q-checkbox" />
-            <label for="s2-q4">
-              <h3>Q4. Electricity Consumption Checker</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Consumer</code> and <code>Consumption</code>.</p>
-          <p>Take Name, Consumer number, Previous and Current meter reading. Calculate units:</p>
-          <ul>
-            <li>Below 100 units &rarr; "Low Consumption"</li>
-            <li>100–300 units &rarr; "Normal Consumption"</li>
-            <li>Above 300 units &rarr; "High Consumption"</li>
-          </ul>
-          <p>Display total units and consumption tier.</p>
-        </div>
-      </div>
-
-      <!-- Set 3 -->
-      <div id="set-3" class="set-content hidden">
-        <div class="question-card" data-q="Q1">
-          <div class="question-select-header">
-            <input type="checkbox" id="s3-q1" value="Q1" class="q-checkbox" />
-            <label for="s3-q1">
-              <h3>Q1. Bank Loan Eligibility System</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Customer</code> and <code>Loan</code>.</p>
-          <p>Take Name, Age, Monthly salary, and Credit score. Eligible if:</p>
-          <ul>
-            <li>Age &ge; 21</li>
-            <li>Monthly salary &ge; ₹25,000</li>
-            <li>Credit score &ge; 700</li>
-          </ul>
-          <p>Display "Loan Eligible" or "Loan Not Eligible".</p>
-        </div>
-
-        <div class="question-card" data-q="Q2">
-          <div class="question-select-header">
-            <input type="checkbox" id="s3-q2" value="Q2" class="q-checkbox" />
-            <label for="s3-q2">
-              <h3>Q2. Movie Ticket Booking</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Customer</code> and <code>MovieTicket</code>.</p>
-          <p>Take Name, Number of tickets, and Ticket price. Apply discounts:</p>
-          <ul>
-            <li>1–2 tickets &rarr; No discount</li>
-            <li>3–5 tickets &rarr; 10% discount</li>
-            <li>More than 5 tickets &rarr; 15% discount</li>
-          </ul>
-          <p>Display final bill.</p>
-        </div>
-
-        <div class="question-card" data-q="Q3">
-          <div class="question-select-header">
-            <input type="checkbox" id="s3-q3" value="Q3" class="q-checkbox" />
-            <label for="s3-q3">
-              <h3>Q3. Parking Fee Calculator</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Vehicle</code> and <code>Parking</code>.</p>
-          <p>Take Vehicle number, Type, and Hours parked. Switch options:</p>
-          <ul>
-            <li>1. Bike &rarr; ₹20/hour</li>
-            <li>2. Car &rarr; ₹40/hour</li>
-            <li>3. Bus &rarr; ₹60/hour</li>
-          </ul>
-          <p>If parked for &gt; 5 hours, add an extra ₹50 parking charge.</p>
-        </div>
-
-        <div class="question-card" data-q="Q4">
-          <div class="question-select-header">
-            <input type="checkbox" id="s3-q4" value="Q4" class="q-checkbox" />
-            <label for="s3-q4">
-              <h3>Q4. Mobile Recharge System</h3>
-            </label>
-          </div>
-          <p>Create two classes: <code>Customer</code> and <code>Recharge</code>.</p>
-          <p>Switch plan selector:</p>
-          <table>
-            <thead>
-              <tr>
-                <th>Plan</th>
-                <th>Validity</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>₹199</td>
-                <td>28 days</td>
-              </tr>
-              <tr>
-                <td>₹299</td>
-                <td>30 days</td>
-              </tr>
-              <tr>
-                <td>₹399</td>
-                <td>56 days</td>
-              </tr>
-              <tr>
-                <td>₹499</td>
-                <td>84 days</td>
-              </tr>
-            </tbody>
-          </table>
-          <p>Display Customer name, Selected plan, Amount, and Validity.</p>
-        </div>
-      </div>
+      <!-- Dynamically Injected Questions Set -->
+      <div id="dynamic-questions-container"></div>
 
       <!-- Action Area -->
       <div class="card action-bar">
@@ -630,6 +377,10 @@
 
         <!-- Step A: Registration Check -->
         <div id="modal-reg-step">
+          <div class="form-group">
+            <label for="modal-ca-select">Assessment</label>
+            <select id="modal-ca-select"></select>
+          </div>
           <div class="form-group">
             <label for="modal-reg-input">Enter Registration Number</label>
             <input type="text" id="modal-reg-input" placeholder="e.g., 12109876" autocomplete="off" />
@@ -660,10 +411,14 @@
   </div>
 
   <script>
-    // PASTE YOUR NEW DEPLOYED WEB APP URL HERE:
-    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOn2KROUEy9DIRk7xxvg_ZvwJ0QPvddjf2r9HkNGsyrdOB4LapoRhwE__vdRvo4F1T/exec";
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOn2KROUEy9DIRk7xxvg_ZvwJ0QPvddjf2r9HkNGsyrdOB4LapoRhwE__vdRvo4F1T/exec"; //[cite: 2, 3]
+
+    var caRegistry = {};
+    var selectedCA = null;
 
     document.addEventListener("DOMContentLoaded", function () {
+      var studentCaSelect = document.getElementById("student-ca-select");
+      var modalCaSelect = document.getElementById("modal-ca-select");
       var authPanel = document.getElementById("auth-panel");
       var instructionsPanel = document.getElementById("instructions-panel");
       var dashboardPanel = document.getElementById("dashboard-panel");
@@ -671,9 +426,10 @@
       var showQuestionsBtn = document.getElementById("show-questions-btn");
       var saveBtn = document.getElementById("save-selection-btn");
       var statusDisplay = document.getElementById("status-display");
+      var questionsContainer = document.getElementById("dynamic-questions-container");
 
       var studentData = {
-        course: "CAP392",
+        caId: "CA1",
         name: "",
         regNo: "",
         setNumber: 1,
@@ -681,7 +437,49 @@
         selectedQuestions: []
       };
 
+      function jsonp(url) {
+        return new Promise(function (resolve) {
+          var cbName = "st_cb_" + Math.round(100000 * Math.random());
+          var script = document.createElement("script");
+          window[cbName] = function (res) {
+            delete window[cbName];
+            if (script.parentNode) script.parentNode.removeChild(script);
+            resolve(res);
+          };
+          script.src = url + (url.indexOf("?") !== -1 ? "&" : "?") + "callback=" + cbName;
+          document.body.appendChild(script);
+        });
+      }
+
+      async function initializeCAs() {
+        var res = await jsonp(GOOGLE_SCRIPT_URL + "?action=getAllCAs");
+        studentCaSelect.innerHTML = "";
+        modalCaSelect.innerHTML = "";
+
+        if (res && res.status === "success" && res.cas && res.cas.length > 0) {
+          res.cas.forEach(function (ca) {
+            caRegistry[ca.id] = ca;
+            var opt1 = document.createElement("option");
+            opt1.value = ca.id;
+            opt1.textContent = ca.id + " - " + (ca.name || ca.id);
+            studentCaSelect.appendChild(opt1);
+
+            var opt2 = document.createElement("option");
+            opt2.value = ca.id;
+            opt2.textContent = ca.id + " - " + (ca.name || ca.id);
+            modalCaSelect.appendChild(opt2);
+          });
+        } else {
+          // Fallback if none configured yet
+          studentCaSelect.innerHTML = '<option value="CA1">CA1 - Java Practical</option>';
+          modalCaSelect.innerHTML = '<option value="CA1">CA1 - Java Practical</option>';
+        }
+      }
+
+      initializeCAs();
+
       proceedBtn.addEventListener("click", function () {
+        var caId = studentCaSelect.value;
         var name = document.getElementById("fullName").value.trim();
         var regNo = document.getElementById("regNo").value.trim();
 
@@ -690,25 +488,31 @@
           return;
         }
 
+        selectedCA = caRegistry[caId] || {
+          id: caId,
+          name: "Practical Assessment",
+          sets: [
+            { setNum: 1, groupName: "Group A (A - H)", charStart: "A", charEnd: "H", questions: [] },
+            { setNum: 2, groupName: "Group B (I - P)", charStart: "I", charEnd: "P", questions: [] },
+            { setNum: 3, groupName: "Group C (Q - Z)", charStart: "Q", charEnd: "Z", questions: [] }
+          ]
+        };
+
+        // Determine Set Allocation using custom authoring boundaries
         var firstChar = name.charAt(0).toUpperCase();
-        var setNum = 1;
-        var groupName = "Group A (A - H)";
+        var matchedSet = selectedCA.sets.find(function (s) {
+          return firstChar >= s.charStart && firstChar <= s.charEnd;
+        }) || selectedCA.sets[selectedCA.sets.length - 1];
 
-        if (firstChar >= "A" && firstChar <= "H") {
-          setNum = 1;
-          groupName = "Group A (A - H)";
-        } else if (firstChar >= "I" && firstChar <= "P") {
-          setNum = 2;
-          groupName = "Group B (I - P)";
-        } else {
-          setNum = 3;
-          groupName = "Group C (Q - Z & Others)";
-        }
-
+        studentData.caId = caId;
         studentData.name = name;
         studentData.regNo = regNo;
-        studentData.setNumber = setNum;
-        studentData.groupName = groupName;
+        studentData.setNumber = matchedSet.setNum;
+        studentData.groupName = matchedSet.groupName;
+        studentData.allocatedSet = matchedSet;
+
+        document.getElementById("ca-inst-tag").textContent = "ASSESSMENT: " + caId;
+        document.getElementById("ca-inst-title").textContent = selectedCA.name;
 
         authPanel.classList.add("hidden");
         instructionsPanel.classList.remove("hidden");
@@ -718,18 +522,34 @@
         instructionsPanel.classList.add("hidden");
         dashboardPanel.classList.remove("hidden");
 
+        document.getElementById("display-ca").textContent = "Assessment: " + studentData.caId;
         document.getElementById("display-name").textContent = "Name: " + studentData.name;
         document.getElementById("display-reg").textContent = "Reg No: " + studentData.regNo;
         document.getElementById("display-group").textContent = studentData.groupName;
         document.getElementById("display-set").textContent = "Assigned: SET " + studentData.setNumber;
 
-        var activeSet = document.getElementById("set-" + studentData.setNumber);
-        activeSet.classList.remove("hidden");
+        // Render Allocated Questions
+        questionsContainer.innerHTML = "";
+        studentData.allocatedSet.questions.forEach(function (q) {
+          var qCard = document.createElement("div");
+          qCard.className = "question-card";
+          qCard.dataset.q = q.code;
 
-        var checkboxes = activeSet.querySelectorAll(".q-checkbox");
+          qCard.innerHTML = `
+            <div class="question-select-header">
+              <input type="checkbox" id="cb-${q.code}" value="${q.code}" class="q-checkbox" />
+              <label for="cb-${q.code}"><h3>${q.code}. ${q.title}</h3></label>
+            </div>
+            <div>${q.html}</div>
+          `;
+
+          questionsContainer.appendChild(qCard);
+        });
+
+        var checkboxes = questionsContainer.querySelectorAll(".q-checkbox");
         checkboxes.forEach(function (cb) {
           cb.addEventListener("change", function () {
-            var checked = activeSet.querySelectorAll(".q-checkbox:checked");
+            var checked = questionsContainer.querySelectorAll(".q-checkbox:checked");
             if (checked.length > 2) {
               cb.checked = false;
               alert("You can only select a maximum of 2 questions.");
@@ -741,9 +561,7 @@
       });
 
       saveBtn.addEventListener("click", async function () {
-        var activeSet = document.getElementById("set-" + studentData.setNumber);
-        var checkedBoxes = activeSet.querySelectorAll(".q-checkbox:checked");
-
+        var checkedBoxes = questionsContainer.querySelectorAll(".q-checkbox:checked");
         if (checkedBoxes.length !== 2) {
           statusDisplay.textContent = "Please select exactly 2 questions.";
           statusDisplay.className = "status-msg error";
@@ -759,7 +577,8 @@
 
         var payload = {
           action: "saveSelection",
-          course: studentData.course,
+          caId: studentData.caId,
+          course: "CAP392",
           regNo: studentData.regNo,
           name: studentData.name,
           group: studentData.groupName,
@@ -777,16 +596,15 @@
 
           statusDisplay.textContent = "Selection saved successfully! Proceed to upload when finished.";
           statusDisplay.className = "status-msg success";
-          activeSet.querySelectorAll(".q-checkbox").forEach(function (cb) { cb.disabled = true; });
+          questionsContainer.querySelectorAll(".q-checkbox").forEach(function (cb) { cb.disabled = true; });
         } catch (err) {
-          console.error(err);
-          statusDisplay.textContent = "Error saving. Please check connection.";
+          statusDisplay.textContent = "Error saving. Please check network.";
           statusDisplay.className = "status-msg error";
           saveBtn.disabled = false;
         }
       });
 
-      // --- Modal Logic with resilient JSONP ---
+      // --- Upload Modal Logic ---
       var uploadModal = document.getElementById("upload-modal");
       var openModalBtn = document.getElementById("open-upload-modal-btn");
       var closeModalBtn = document.getElementById("close-modal-btn");
@@ -804,44 +622,14 @@
       openModalBtn.addEventListener("click", function () {
         uploadModal.classList.remove("hidden");
         if (studentData.regNo) modalRegInput.value = studentData.regNo;
+        if (studentData.caId) modalCaSelect.value = studentData.caId;
       });
 
-      closeModalBtn.addEventListener("click", function () {
-        uploadModal.classList.add("hidden");
-      });
-
-      function checkRegJSONP(regNo) {
-        return new Promise(function (resolve, reject) {
-          var callbackName = "handleRegCheck_" + Math.round(100000 * Math.random());
-          var script = document.createElement("script");
-
-          var timeout = setTimeout(function () {
-            delete window[callbackName];
-            if (script.parentNode) script.parentNode.removeChild(script);
-            reject(new Error("Timeout checking registration"));
-          }, 10000);
-
-          window[callbackName] = function (data) {
-            clearTimeout(timeout);
-            delete window[callbackName];
-            if (script.parentNode) script.parentNode.removeChild(script);
-            resolve(data);
-          };
-
-          script.onerror = function () {
-            clearTimeout(timeout);
-            delete window[callbackName];
-            if (script.parentNode) script.parentNode.removeChild(script);
-            reject(new Error("Network error"));
-          };
-
-          script.src = GOOGLE_SCRIPT_URL + "?action=checkReg&regNo=" + encodeURIComponent(regNo) + "&callback=" + callbackName;
-          document.body.appendChild(script);
-        });
-      }
+      closeModalBtn.addEventListener("click", function () { uploadModal.classList.add("hidden"); });
 
       verifyRegBtn.addEventListener("click", async function () {
         var reg = modalRegInput.value.trim();
+        var caId = modalCaSelect.value;
         if (!reg) {
           alert("Enter a Registration Number first.");
           return;
@@ -852,18 +640,19 @@
         verifyStatus.className = "status-msg";
 
         try {
-          var json = await checkRegJSONP(reg);
-
+          var json = await jsonp(GOOGLE_SCRIPT_URL + "?action=checkReg&caId=" + encodeURIComponent(caId) + "&regNo=" + encodeURIComponent(reg));
           if (json && json.status === "found") {
             verifiedData = json;
             verifiedData.regNo = reg;
+            verifiedData.caId = caId;
+
             verifyStatus.textContent = "";
             modalRegStep.classList.add("hidden");
             modalUploadStep.classList.remove("hidden");
 
             modalInfoBox.innerHTML =
               "<strong>Verified:</strong> " + json.name + " (" + reg + ")<br>" +
-              "<strong>Allotted:</strong> " + json.group + " | " + json.set + "<br>" +
+              "<strong>Assessment:</strong> " + caId + " | " + json.group + " | " + json.set + "<br>" +
               "<strong>Selected:</strong> " + json.selectedQuestions;
 
             var qs = (json.selectedQuestions || "").split(",").map(function (q) { return q.trim(); });
@@ -872,12 +661,11 @@
               document.getElementById("label-file-2").textContent = "Solution for " + qs[1] + ":";
             }
           } else {
-            verifyStatus.textContent = "Registration Number not found or selection not saved yet.";
+            verifyStatus.textContent = "Registration Number not found in " + caId + " or selection not saved.";
             verifyStatus.className = "status-msg error";
             verifyRegBtn.disabled = false;
           }
         } catch (err) {
-          console.error(err);
           verifyStatus.textContent = "Error checking registration. Please retry.";
           verifyStatus.className = "status-msg error";
           verifyRegBtn.disabled = false;
@@ -888,21 +676,21 @@
         return new Promise(function (resolve, reject) {
           var reader = new FileReader();
           reader.onload = function () {
-            var rawBase64 = reader.result.split(",")[1];
-            resolve(rawBase64);
+            resolve(reader.result.split(",")[1]);
           };
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
       }
 
-      function sendSingleFile(regNo, fileIndex, fileObj) {
+      function sendSingleFile(caId, regNo, fileIndex, fileObj) {
         return fileToBase64(fileObj).then(function (base64) {
           var payload = {
             action: "uploadSingleFile",
+            caId: caId,
             regNo: regNo,
             fileIndex: fileIndex,
-            fileName: regNo + "_File" + fileIndex + "_" + fileObj.name,
+            fileName: regNo + "_" + caId + "_File" + fileIndex + "_" + fileObj.name,
             mimeType: fileObj.type || "text/plain",
             fileData: base64
           };
@@ -931,15 +719,14 @@
 
         try {
           uploadStatus.textContent = "Uploading Question 1 solution...";
-          await sendSingleFile(verifiedData.regNo, 1, f1);
+          await sendSingleFile(verifiedData.caId, verifiedData.regNo, 1, f1);
 
           uploadStatus.textContent = "Uploading Question 2 solution...";
-          await sendSingleFile(verifiedData.regNo, 2, f2);
+          await sendSingleFile(verifiedData.caId, verifiedData.regNo, 2, f2);
 
-          uploadStatus.textContent = "Both files uploaded! Check Columns G & H in your sheet.";
+          uploadStatus.textContent = "Both files uploaded! " + verifiedData.caId + ".";
           uploadStatus.className = "status-msg success";
         } catch (err) {
-          console.error(err);
           uploadStatus.textContent = "Upload failed. Please check network.";
           uploadStatus.className = "status-msg error";
           uploadFilesBtn.disabled = false;
