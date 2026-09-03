@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Java Practical Assignment Portal - CAP392</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #eff6ff;
+      --success: #16a34a;
+      --error: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 840px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .header-tag {
+      display: inline-block;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: var(--muted);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+    }
+
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .badge-bar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .badge {
+      background: var(--accent);
+      color: var(--primary);
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .alert-box {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      color: #92400e;
+    }
+
+    ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    .question-card {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      background: #fafafa;
+      transition: border-color 0.2s;
+    }
+
+    .question-card.selected {
+      border-color: var(--primary);
+      background: #f0f7ff;
+    }
+
+    .question-select-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .question-select-header input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      cursor: pointer;
+    }
+
+    .question-select-header h3 {
+      margin-bottom: 0;
+      font-size: 1.15rem;
+      color: var(--primary);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid var(--border);
+    }
+
+    th,
+    td {
+      padding: 0.6rem;
+      text-align: left;
+    }
+
+    th {
+      background: var(--accent);
+      color: var(--text);
+    }
+
+    .action-bar {
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .status-msg {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .status-msg.success {
+      color: var(--success);
+    }
+
+    .status-msg.error {
+      color: var(--error);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Step 1: Login Form -->
+    <div id="auth-panel" class="card">
+      <div class="header-tag">COURSE CODE: CAP392</div>
+      <h1>Practical Assignment: Java</h1>
+      <p>Enter your credentials to get your categorized set allocation.</p>
+
+      <form id="student-form">
+        <div class="form-group">
+          <label for="regNo">Registration Number</label>
+          <input type="text" id="regNo" placeholder="e.g., 12109876" required />
+        </div>
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" placeholder="e.g., Jane Doe" required />
+        </div>
+        <button type="submit">Proceed to Instructions</button>
+      </form>
+    </div>
+
+    <!-- Step 2: Instructions Panel -->
+    <div id="instructions-panel" class="card hidden">
+      <div class="header-tag">COURSE CODE: CAP392</div>
+      <h2>General Instructions &amp; Timing</h2>
+
+      <div class="alert-box">
+        <strong>Time Allowed:</strong> 40 minutes total (20 minutes per question).
+      </div>
+
+      <ul>
+        <li><strong>Attempt any TWO questions</strong> from your allocated set.</li>
+        <li><strong>Selection Requirement:</strong> You must check the boxes for the 2 questions you are attempting and
+          click <strong>Save Selection</strong> to record your choices.</li>
+        <li><strong>Use multiple classes</strong> wherever specified in the problem statement.</li>
+        <li><strong>Dynamic Input:</strong> Take all required input from the user using <code>Scanner</code>.</li>
+        <li><strong>Control Structures:</strong> Implement the appropriate control logic (if-else, switch, loops) as
+          mandated.</li>
+        <li>Ensure output formatting adheres to the requirements.</li>
+      </ul>
+      <button id="show-questions-btn">View My Allocated Set</button>
+    </div>
+
+    <!-- Step 3: Questions Dashboard -->
+    <div id="dashboard-panel" class="hidden">
+      <div class="card">
+        <div class="badge-bar">
+          <span class="badge" id="display-course">Course: CAP392</span>
+          <span class="badge" id="display-name"></span>
+          <span class="badge" id="display-reg"></span>
+          <span class="badge" id="display-group"></span>
+          <span class="badge" id="display-set"></span>
+        </div>
+        <h2>Problem Statements</h2>
+        <p>Select <strong>exactly 2 questions</strong> below, then click "Save Selection" to confirm.</p>
+      </div>
+
+      <!-- Set 1 -->
+      <div id="set-1" class="set-content hidden">
+        <div class="question-card" data-q="Q1">
+          <div class="question-select-header">
+            <input type="checkbox" id="s1-q1" value="Q1" class="q-checkbox" />
+            <label for="s1-q1">
+              <h3>Q1. Student Result System</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Student</code> and <code>Result</code>.</p>
+          <p><strong>Student class stores:</strong> Student name, Roll number, Marks of 3 subjects.</p>
+          <p><strong>Result class calculates &amp; displays:</strong> Total marks, Percentage, and Pass/Fail (Pass only
+            if &ge; 40 marks in each subject).</p>
+        </div>
+
+        <div class="question-card" data-q="Q2">
+          <div class="question-select-header">
+            <input type="checkbox" id="s1-q2" value="Q2" class="q-checkbox" />
+            <label for="s1-q2">
+              <h3>Q2. Electricity Bill Calculator</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Customer</code> and <code>ElectricityBill</code>.</p>
+          <p><strong>Customer class stores:</strong> Customer name, Customer ID, Units consumed.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Units Consumed</th>
+                <th>Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0 – 100</td>
+                <td>₹2 / unit</td>
+              </tr>
+              <tr>
+                <td>101 – 200</td>
+                <td>₹3 / unit</td>
+              </tr>
+              <tr>
+                <td>201 – 300</td>
+                <td>₹5 / unit</td>
+              </tr>
+              <tr>
+                <td>Above 300</td>
+                <td>₹7 / unit</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>Display customer's name, units consumed, and total bill.</p>
+        </div>
+
+        <div class="question-card" data-q="Q3">
+          <div class="question-select-header">
+            <input type="checkbox" id="s1-q3" value="Q3" class="q-checkbox" />
+            <label for="s1-q3">
+              <h3>Q3. Employee Salary Calculator</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Employee</code> and <code>Salary</code>.</p>
+          <p>Take Employee name, Employee ID, Basic salary. Calculate:</p>
+          <ul>
+            <li>HRA = 20% of basic salary</li>
+            <li>DA = 10% of basic salary</li>
+            <li>Gross Salary = Basic + HRA + DA</li>
+          </ul>
+          <p>If Gross &gt; ₹50,000 &rarr; "High Salary", else &rarr; "Normal Salary".</p>
+        </div>
+
+        <div class="question-card" data-q="Q4">
+          <div class="question-select-header">
+            <input type="checkbox" id="s1-q4" value="Q4" class="q-checkbox" />
+            <label for="s1-q4">
+              <h3>Q4. ATM Withdrawal System</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Account</code> and <code>ATM</code>.</p>
+          <p>Take account holder name, account number, account balance, and withdrawal amount. Check:</p>
+          <ul>
+            <li>Amount &gt; balance &rarr; "Insufficient Balance"</li>
+            <li>Amount not multiple of ₹100 &rarr; "Enter amount in multiples of 100"</li>
+            <li>Otherwise &rarr; perform withdrawal and display remaining balance</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Set 2 -->
+      <div id="set-2" class="set-content hidden">
+        <div class="question-card" data-q="Q1">
+          <div class="question-select-header">
+            <input type="checkbox" id="s2-q1" value="Q1" class="q-checkbox" />
+            <label for="s2-q1">
+              <h3>Q1. Shopping Discount System</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Customer</code> and <code>Shopping</code>.</p>
+          <p>Take customer name and total shopping amount. Apply discount:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Shopping Amount</th>
+                <th>Discount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Below ₹5,000</td>
+                <td>No discount</td>
+              </tr>
+              <tr>
+                <td>₹5,000 – ₹9,999</td>
+                <td>10%</td>
+              </tr>
+              <tr>
+                <td>₹10,000 – ₹19,999</td>
+                <td>15%</td>
+              </tr>
+              <tr>
+                <td>₹20,000 or above</td>
+                <td>20%</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>Display Customer name, Shopping amount, Discount, and Final amount.</p>
+        </div>
+
+        <div class="question-card" data-q="Q2">
+          <div class="question-select-header">
+            <input type="checkbox" id="s2-q2" value="Q2" class="q-checkbox" />
+            <label for="s2-q2">
+              <h3>Q2. Employee Attendance System</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Employee</code> and <code>Attendance</code>.</p>
+          <p>Take Name, ID, Total working days, and Days present. Calculate attendance percentage:</p>
+          <ul>
+            <li>80% or above &rarr; "Good Attendance"</li>
+            <li>60% to below 80% &rarr; "Average Attendance"</li>
+            <li>Below 60% &rarr; "Poor Attendance"</li>
+          </ul>
+        </div>
+
+        <div class="question-card" data-q="Q3">
+          <div class="question-select-header">
+            <input type="checkbox" id="s2-q3" value="Q3" class="q-checkbox" />
+            <label for="s2-q3">
+              <h3>Q3. Restaurant Billing System</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Customer</code> and <code>Restaurant</code>.</p>
+          <p>Use switch to select: 1. Pizza (₹250), 2. Burger (₹150), 3. Sandwich (₹100), 4. Coffee (₹80).</p>
+          <p>Take item and quantity. If bill &gt; ₹1,000, apply a 10% discount.</p>
+        </div>
+
+        <div class="question-card" data-q="Q4">
+          <div class="question-select-header">
+            <input type="checkbox" id="s2-q4" value="Q4" class="q-checkbox" />
+            <label for="s2-q4">
+              <h3>Q4. Electricity Consumption Checker</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Consumer</code> and <code>Consumption</code>.</p>
+          <p>Take Name, Consumer number, Previous and Current meter reading. Calculate units:</p>
+          <ul>
+            <li>Below 100 units &rarr; "Low Consumption"</li>
+            <li>100–300 units &rarr; "Normal Consumption"</li>
+            <li>Above 300 units &rarr; "High Consumption"</li>
+          </ul>
+          <p>Display total units and consumption tier.</p>
+        </div>
+      </div>
+
+      <!-- Set 3 -->
+      <div id="set-3" class="set-content hidden">
+        <div class="question-card" data-q="Q1">
+          <div class="question-select-header">
+            <input type="checkbox" id="s3-q1" value="Q1" class="q-checkbox" />
+            <label for="s3-q1">
+              <h3>Q1. Bank Loan Eligibility System</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Customer</code> and <code>Loan</code>.</p>
+          <p>Take Name, Age, Monthly salary, and Credit score. Eligible if:</p>
+          <ul>
+            <li>Age &ge; 21</li>
+            <li>Monthly salary &ge; ₹25,000</li>
+            <li>Credit score &ge; 700</li>
+          </ul>
+          <p>Display "Loan Eligible" or "Loan Not Eligible".</p>
+        </div>
+
+        <div class="question-card" data-q="Q2">
+          <div class="question-select-header">
+            <input type="checkbox" id="s3-q2" value="Q2" class="q-checkbox" />
+            <label for="s3-q2">
+              <h3>Q2. Movie Ticket Booking</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Customer</code> and <code>MovieTicket</code>.</p>
+          <p>Take Name, Number of tickets, and Ticket price. Apply discounts:</p>
+          <ul>
+            <li>1–2 tickets &rarr; No discount</li>
+            <li>3–5 tickets &rarr; 10% discount</li>
+            <li>More than 5 tickets &rarr; 15% discount</li>
+          </ul>
+          <p>Display final bill.</p>
+        </div>
+
+        <div class="question-card" data-q="Q3">
+          <div class="question-select-header">
+            <input type="checkbox" id="s3-q3" value="Q3" class="q-checkbox" />
+            <label for="s3-q3">
+              <h3>Q3. Parking Fee Calculator</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Vehicle</code> and <code>Parking</code>.</p>
+          <p>Take Vehicle number, Type, and Hours parked. Switch options:</p>
+          <ul>
+            <li>1. Bike &rarr; ₹20/hour</li>
+            <li>2. Car &rarr; ₹40/hour</li>
+            <li>3. Bus &rarr; ₹60/hour</li>
+          </ul>
+          <p>If parked for &gt; 5 hours, add an extra ₹50 parking charge.</p>
+        </div>
+
+        <div class="question-card" data-q="Q4">
+          <div class="question-select-header">
+            <input type="checkbox" id="s3-q4" value="Q4" class="q-checkbox" />
+            <label for="s3-q4">
+              <h3>Q4. Mobile Recharge System</h3>
+            </label>
+          </div>
+          <p>Create two classes: <code>Customer</code> and <code>Recharge</code>.</p>
+          <p>Switch plan selector:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Plan</th>
+                <th>Validity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>₹199</td>
+                <td>28 days</td>
+              </tr>
+              <tr>
+                <td>₹299</td>
+                <td>30 days</td>
+              </tr>
+              <tr>
+                <td>₹399</td>
+                <td>56 days</td>
+              </tr>
+              <tr>
+                <td>₹499</td>
+                <td>84 days</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>Display Customer name, Selected plan, Amount, and Validity.</p>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="card action-bar">
+        <button id="save-selection-btn">Save Selection to Sheet</button>
+        <div id="status-display" class="status-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL HERE:
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_bfiVEkGfRCnFL_3P4lQQ_VBmhQ8yjxCYaAUi7whxPHRo8DvGf53nErJoGf3TrovlLw/exec";
+
+    const studentForm = document.getElementById("student-form");
+    const authPanel = document.getElementById("auth-panel");
+    const instructionsPanel = document.getElementById("instructions-panel");
+    const dashboardPanel = document.getElementById("dashboard-panel");
+    const showQuestionsBtn = document.getElementById("show-questions-btn");
+    const saveBtn = document.getElementById("save-selection-btn");
+    const statusDisplay = document.getElementById("status-display");
+
+    let studentData = {
+      course: "CAP392",
+      name: "",
+      regNo: "",
+      setNumber: 1,
+      groupName: "",
+      selectedQuestions: []
+    };
+
+    studentForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("fullName").value.trim();
+      const regNo = document.getElementById("regNo").value.trim();
+
+      if (!name || !regNo) return;
+
+      const firstChar = name.charAt(0).toUpperCase();
+      let setNum = 1;
+      let groupName = "Group A (A - H)";
+
+      if (firstChar >= "A" && firstChar <= "H") {
+        setNum = 1;
+        groupName = "Group A (A - H)";
+      } else if (firstChar >= "I" && firstChar <= "P") {
+        setNum = 2;
+        groupName = "Group B (I - P)";
+      } else {
+        setNum = 3;
+        groupName = "Group C (Q - Z & Others)";
+      }
+
+      studentData.name = name;
+      studentData.regNo = regNo;
+      studentData.setNumber = setNum;
+      studentData.groupName = groupName;
+
+      authPanel.classList.add("hidden");
+      instructionsPanel.classList.remove("hidden");
+    });
+
+    showQuestionsBtn.addEventListener("click", function () {
+      instructionsPanel.classList.add("hidden");
+      dashboardPanel.classList.remove("hidden");
+
+      document.getElementById("display-name").textContent = "Name: " + studentData.name;
+      document.getElementById("display-reg").textContent = "Reg No: " + studentData.regNo;
+      document.getElementById("display-group").textContent = studentData.groupName;
+      document.getElementById("display-set").textContent = "Assigned: SET " + studentData.setNumber;
+
+      const activeSet = document.getElementById("set-" + studentData.setNumber);
+      activeSet.classList.remove("hidden");
+
+      // Setup checkbox listeners within the active set
+      const checkboxes = activeSet.querySelectorAll(".q-checkbox");
+      checkboxes.forEach((cb) => {
+        cb.addEventListener("change", () => {
+          const checked = activeSet.querySelectorAll(".q-checkbox:checked");
+          if (checked.length > 2) {
+            cb.checked = false;
+            alert("You can only select a maximum of 2 questions.");
+            return;
+          }
+          cb.closest(".question-card").classList.toggle("selected", cb.checked);
+        });
+      });
+    });
+
+    saveBtn.addEventListener("click", async function () {
+      const activeSet = document.getElementById("set-" + studentData.setNumber);
+      const checkedBoxes = activeSet.querySelectorAll(".q-checkbox:checked");
+
+      if (checkedBoxes.length !== 2) {
+        statusDisplay.textContent = "Please select exactly 2 questions.";
+        statusDisplay.className = "status-msg error";
+        return;
+      }
+
+      const selectedQuestions = Array.from(checkedBoxes).map((cb) => cb.value);
+      studentData.selectedQuestions = selectedQuestions;
+
+      saveBtn.disabled = true;
+      statusDisplay.textContent = "Saving to Google Sheet...";
+      statusDisplay.className = "status-msg";
+
+      const payload = {
+        course: studentData.course,
+        regNo: studentData.regNo,
+        name: studentData.name,
+        group: studentData.groupName,
+        set: "SET " + studentData.setNumber,
+        selectedQuestions: studentData.selectedQuestions
+      };
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        statusDisplay.textContent = "Selection saved successfully!";
+        statusDisplay.className = "status-msg success";
+
+        // Lock selections
+        activeSet.querySelectorAll(".q-checkbox").forEach(cb => cb.disabled = true);
+      } catch (err) {
+        console.error(err);
+        statusDisplay.textContent = "Error saving data. Check connection/script URL.";
+        statusDisplay.className = "status-msg error";
+        saveBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+
+</html>
