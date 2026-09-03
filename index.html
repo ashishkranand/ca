@@ -23,7 +23,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -39,6 +39,20 @@
     .container {
       width: 100%;
       max-width: 840px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1rem;
+    }
+
+    .btn-upload-nav {
+      background: #059669;
+    }
+
+    .btn-upload-nav:hover {
+      background: #047857;
     }
 
     .card {
@@ -88,14 +102,15 @@
       font-size: 0.9rem;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    input[type="file"] {
       width: 100%;
       padding: 0.75rem 1rem;
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 1rem;
       outline: none;
-      transition: border-color 0.2s;
+      background: #fff;
     }
 
     input[type="text"]:focus {
@@ -158,7 +173,6 @@
     }
 
     .question-card {
-      position: relative;
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 1.25rem;
@@ -236,28 +250,66 @@
     .status-msg.error {
       color: var(--error);
     }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-card {
+      background: #fff;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 12px;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <!-- Step 1: Login Form -->
+    <div class="top-bar">
+      <button type="button" id="open-upload-modal-btn" class="btn-upload-nav">Upload Files</button>
+    </div>
+
+    <!-- Step 1: Input Panel -->
     <div id="auth-panel" class="card">
       <div class="header-tag">COURSE CODE: CAP392</div>
       <h1>Practical Assignment: Java</h1>
       <p>Enter your credentials to get your categorized set allocation.</p>
 
-      <form id="student-form">
-        <div class="form-group">
-          <label for="regNo">Registration Number</label>
-          <input type="text" id="regNo" placeholder="e.g., 12109876" required />
-        </div>
-        <div class="form-group">
-          <label for="fullName">Full Name</label>
-          <input type="text" id="fullName" placeholder="e.g., Jane Doe" required />
-        </div>
-        <button type="submit">Proceed to Instructions</button>
-      </form>
+      <div class="form-group">
+        <label for="regNo">Registration Number</label>
+        <input type="text" id="regNo" placeholder="e.g., 12109876" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" placeholder="e.g., Jane Doe" autocomplete="off" />
+      </div>
+      <button type="button" id="proceed-auth-btn">Proceed to Instructions</button>
     </div>
 
     <!-- Step 2: Instructions Panel -->
@@ -271,15 +323,16 @@
 
       <ul>
         <li><strong>Attempt any TWO questions</strong> from your allocated set.</li>
-        <li><strong>Selection Requirement:</strong> You must check the boxes for the 2 questions you are attempting and
-          click <strong>Save Selection</strong> to record your choices.</li>
+        <li><strong>Selection Requirement:</strong> Check the boxes for the 2 questions you are attempting and click
+          <strong>Save Selection to Sheet</strong>.
+        </li>
         <li><strong>Use multiple classes</strong> wherever specified in the problem statement.</li>
         <li><strong>Dynamic Input:</strong> Take all required input from the user using <code>Scanner</code>.</li>
-        <li><strong>Control Structures:</strong> Implement the appropriate control logic (if-else, switch, loops) as
-          mandated.</li>
-        <li>Ensure output formatting adheres to the requirements.</li>
+        <li><strong>Control Structures:</strong> Implement the appropriate control logic (if-else, switch, loops).</li>
+        <li>After completion, click <strong>Upload Files</strong> at the top to upload your source code files directly
+          to Google Drive.</li>
       </ul>
-      <button id="show-questions-btn">View My Allocated Set</button>
+      <button type="button" id="show-questions-btn">View My Allocated Set</button>
     </div>
 
     <!-- Step 3: Questions Dashboard -->
@@ -293,7 +346,7 @@
           <span class="badge" id="display-set"></span>
         </div>
         <h2>Problem Statements</h2>
-        <p>Select <strong>exactly 2 questions</strong> below, then click "Save Selection" to confirm.</p>
+        <p>Select <strong>exactly 2 questions</strong> below, then click "Save Selection to Sheet" to confirm.</p>
       </div>
 
       <!-- Set 1 -->
@@ -563,138 +616,335 @@
 
       <!-- Action Area -->
       <div class="card action-bar">
-        <button id="save-selection-btn">Save Selection to Sheet</button>
+        <button type="button" id="save-selection-btn">Save Selection to Sheet</button>
         <div id="status-display" class="status-msg"></div>
+      </div>
+    </div>
+
+    <!-- Upload Popup Modal -->
+    <div id="upload-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <button type="button" id="close-modal-btn" class="close-btn">&times;</button>
+        <h2>Upload Practical Submissions</h2>
+        <p>Verify your registration number before uploading solutions.</p>
+
+        <!-- Step A: Registration Check -->
+        <div id="modal-reg-step">
+          <div class="form-group">
+            <label for="modal-reg-input">Enter Registration Number</label>
+            <input type="text" id="modal-reg-input" placeholder="e.g., 12109876" autocomplete="off" />
+          </div>
+          <button type="button" id="verify-reg-btn">Verify Registration</button>
+          <div id="verify-status" class="status-msg" style="margin-top: 0.75rem;"></div>
+        </div>
+
+        <!-- Step B: Upload Inputs -->
+        <div id="modal-upload-step" class="hidden">
+          <div class="alert-box" id="modal-info-box" style="margin-top: 1rem;"></div>
+
+          <div class="form-group">
+            <label id="label-file-1" for="file-input-1">Question 1 Solution:</label>
+            <input type="file" id="file-input-1" />
+          </div>
+
+          <div class="form-group">
+            <label id="label-file-2" for="file-input-2">Question 2 Solution:</label>
+            <input type="file" id="file-input-2" />
+          </div>
+
+          <button type="button" id="upload-files-btn">Upload to Google Drive</button>
+          <div id="upload-status" class="status-msg" style="margin-top: 0.75rem;"></div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL HERE:
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_bfiVEkGfRCnFL_3P4lQQ_VBmhQ8yjxCYaAUi7whxPHRo8DvGf53nErJoGf3TrovlLw/exec";
+    // PASTE YOUR NEW DEPLOYED WEB APP URL HERE:
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOn2KROUEy9DIRk7xxvg_ZvwJ0QPvddjf2r9HkNGsyrdOB4LapoRhwE__vdRvo4F1T/exec";
 
-    const studentForm = document.getElementById("student-form");
-    const authPanel = document.getElementById("auth-panel");
-    const instructionsPanel = document.getElementById("instructions-panel");
-    const dashboardPanel = document.getElementById("dashboard-panel");
-    const showQuestionsBtn = document.getElementById("show-questions-btn");
-    const saveBtn = document.getElementById("save-selection-btn");
-    const statusDisplay = document.getElementById("status-display");
+    document.addEventListener("DOMContentLoaded", function () {
+      var authPanel = document.getElementById("auth-panel");
+      var instructionsPanel = document.getElementById("instructions-panel");
+      var dashboardPanel = document.getElementById("dashboard-panel");
+      var proceedBtn = document.getElementById("proceed-auth-btn");
+      var showQuestionsBtn = document.getElementById("show-questions-btn");
+      var saveBtn = document.getElementById("save-selection-btn");
+      var statusDisplay = document.getElementById("status-display");
 
-    let studentData = {
-      course: "CAP392",
-      name: "",
-      regNo: "",
-      setNumber: 1,
-      groupName: "",
-      selectedQuestions: []
-    };
-
-    studentForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const name = document.getElementById("fullName").value.trim();
-      const regNo = document.getElementById("regNo").value.trim();
-
-      if (!name || !regNo) return;
-
-      const firstChar = name.charAt(0).toUpperCase();
-      let setNum = 1;
-      let groupName = "Group A (A - H)";
-
-      if (firstChar >= "A" && firstChar <= "H") {
-        setNum = 1;
-        groupName = "Group A (A - H)";
-      } else if (firstChar >= "I" && firstChar <= "P") {
-        setNum = 2;
-        groupName = "Group B (I - P)";
-      } else {
-        setNum = 3;
-        groupName = "Group C (Q - Z & Others)";
-      }
-
-      studentData.name = name;
-      studentData.regNo = regNo;
-      studentData.setNumber = setNum;
-      studentData.groupName = groupName;
-
-      authPanel.classList.add("hidden");
-      instructionsPanel.classList.remove("hidden");
-    });
-
-    showQuestionsBtn.addEventListener("click", function () {
-      instructionsPanel.classList.add("hidden");
-      dashboardPanel.classList.remove("hidden");
-
-      document.getElementById("display-name").textContent = "Name: " + studentData.name;
-      document.getElementById("display-reg").textContent = "Reg No: " + studentData.regNo;
-      document.getElementById("display-group").textContent = studentData.groupName;
-      document.getElementById("display-set").textContent = "Assigned: SET " + studentData.setNumber;
-
-      const activeSet = document.getElementById("set-" + studentData.setNumber);
-      activeSet.classList.remove("hidden");
-
-      // Setup checkbox listeners within the active set
-      const checkboxes = activeSet.querySelectorAll(".q-checkbox");
-      checkboxes.forEach((cb) => {
-        cb.addEventListener("change", () => {
-          const checked = activeSet.querySelectorAll(".q-checkbox:checked");
-          if (checked.length > 2) {
-            cb.checked = false;
-            alert("You can only select a maximum of 2 questions.");
-            return;
-          }
-          cb.closest(".question-card").classList.toggle("selected", cb.checked);
-        });
-      });
-    });
-
-    saveBtn.addEventListener("click", async function () {
-      const activeSet = document.getElementById("set-" + studentData.setNumber);
-      const checkedBoxes = activeSet.querySelectorAll(".q-checkbox:checked");
-
-      if (checkedBoxes.length !== 2) {
-        statusDisplay.textContent = "Please select exactly 2 questions.";
-        statusDisplay.className = "status-msg error";
-        return;
-      }
-
-      const selectedQuestions = Array.from(checkedBoxes).map((cb) => cb.value);
-      studentData.selectedQuestions = selectedQuestions;
-
-      saveBtn.disabled = true;
-      statusDisplay.textContent = "Saving to Google Sheet...";
-      statusDisplay.className = "status-msg";
-
-      const payload = {
-        course: studentData.course,
-        regNo: studentData.regNo,
-        name: studentData.name,
-        group: studentData.groupName,
-        set: "SET " + studentData.setNumber,
-        selectedQuestions: studentData.selectedQuestions
+      var studentData = {
+        course: "CAP392",
+        name: "",
+        regNo: "",
+        setNumber: 1,
+        groupName: "",
+        selectedQuestions: []
       };
 
-      try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
+      proceedBtn.addEventListener("click", function () {
+        var name = document.getElementById("fullName").value.trim();
+        var regNo = document.getElementById("regNo").value.trim();
+
+        if (!name || !regNo) {
+          alert("Please enter both Registration Number and Full Name.");
+          return;
+        }
+
+        var firstChar = name.charAt(0).toUpperCase();
+        var setNum = 1;
+        var groupName = "Group A (A - H)";
+
+        if (firstChar >= "A" && firstChar <= "H") {
+          setNum = 1;
+          groupName = "Group A (A - H)";
+        } else if (firstChar >= "I" && firstChar <= "P") {
+          setNum = 2;
+          groupName = "Group B (I - P)";
+        } else {
+          setNum = 3;
+          groupName = "Group C (Q - Z & Others)";
+        }
+
+        studentData.name = name;
+        studentData.regNo = regNo;
+        studentData.setNumber = setNum;
+        studentData.groupName = groupName;
+
+        authPanel.classList.add("hidden");
+        instructionsPanel.classList.remove("hidden");
+      });
+
+      showQuestionsBtn.addEventListener("click", function () {
+        instructionsPanel.classList.add("hidden");
+        dashboardPanel.classList.remove("hidden");
+
+        document.getElementById("display-name").textContent = "Name: " + studentData.name;
+        document.getElementById("display-reg").textContent = "Reg No: " + studentData.regNo;
+        document.getElementById("display-group").textContent = studentData.groupName;
+        document.getElementById("display-set").textContent = "Assigned: SET " + studentData.setNumber;
+
+        var activeSet = document.getElementById("set-" + studentData.setNumber);
+        activeSet.classList.remove("hidden");
+
+        var checkboxes = activeSet.querySelectorAll(".q-checkbox");
+        checkboxes.forEach(function (cb) {
+          cb.addEventListener("change", function () {
+            var checked = activeSet.querySelectorAll(".q-checkbox:checked");
+            if (checked.length > 2) {
+              cb.checked = false;
+              alert("You can only select a maximum of 2 questions.");
+              return;
+            }
+            cb.closest(".question-card").classList.toggle("selected", cb.checked);
+          });
         });
+      });
 
-        statusDisplay.textContent = "Selection saved successfully!";
-        statusDisplay.className = "status-msg success";
+      saveBtn.addEventListener("click", async function () {
+        var activeSet = document.getElementById("set-" + studentData.setNumber);
+        var checkedBoxes = activeSet.querySelectorAll(".q-checkbox:checked");
 
-        // Lock selections
-        activeSet.querySelectorAll(".q-checkbox").forEach(cb => cb.disabled = true);
-      } catch (err) {
-        console.error(err);
-        statusDisplay.textContent = "Error saving data. Check connection/script URL.";
-        statusDisplay.className = "status-msg error";
-        saveBtn.disabled = false;
+        if (checkedBoxes.length !== 2) {
+          statusDisplay.textContent = "Please select exactly 2 questions.";
+          statusDisplay.className = "status-msg error";
+          return;
+        }
+
+        var selectedQuestions = Array.from(checkedBoxes).map(function (cb) { return cb.value; });
+        studentData.selectedQuestions = selectedQuestions;
+
+        saveBtn.disabled = true;
+        statusDisplay.textContent = "Saving to Google Sheet...";
+        statusDisplay.className = "status-msg";
+
+        var payload = {
+          action: "saveSelection",
+          course: studentData.course,
+          regNo: studentData.regNo,
+          name: studentData.name,
+          group: studentData.groupName,
+          set: "SET " + studentData.setNumber,
+          selectedQuestions: studentData.selectedQuestions
+        };
+
+        try {
+          await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+
+          statusDisplay.textContent = "Selection saved successfully! Proceed to upload when finished.";
+          statusDisplay.className = "status-msg success";
+          activeSet.querySelectorAll(".q-checkbox").forEach(function (cb) { cb.disabled = true; });
+        } catch (err) {
+          console.error(err);
+          statusDisplay.textContent = "Error saving. Please check connection.";
+          statusDisplay.className = "status-msg error";
+          saveBtn.disabled = false;
+        }
+      });
+
+      // --- Modal Logic with resilient JSONP ---
+      var uploadModal = document.getElementById("upload-modal");
+      var openModalBtn = document.getElementById("open-upload-modal-btn");
+      var closeModalBtn = document.getElementById("close-modal-btn");
+      var verifyRegBtn = document.getElementById("verify-reg-btn");
+      var modalRegStep = document.getElementById("modal-reg-step");
+      var modalUploadStep = document.getElementById("modal-upload-step");
+      var modalRegInput = document.getElementById("modal-reg-input");
+      var verifyStatus = document.getElementById("verify-status");
+      var modalInfoBox = document.getElementById("modal-info-box");
+      var uploadFilesBtn = document.getElementById("upload-files-btn");
+      var uploadStatus = document.getElementById("upload-status");
+
+      var verifiedData = null;
+
+      openModalBtn.addEventListener("click", function () {
+        uploadModal.classList.remove("hidden");
+        if (studentData.regNo) modalRegInput.value = studentData.regNo;
+      });
+
+      closeModalBtn.addEventListener("click", function () {
+        uploadModal.classList.add("hidden");
+      });
+
+      function checkRegJSONP(regNo) {
+        return new Promise(function (resolve, reject) {
+          var callbackName = "handleRegCheck_" + Math.round(100000 * Math.random());
+          var script = document.createElement("script");
+
+          var timeout = setTimeout(function () {
+            delete window[callbackName];
+            if (script.parentNode) script.parentNode.removeChild(script);
+            reject(new Error("Timeout checking registration"));
+          }, 10000);
+
+          window[callbackName] = function (data) {
+            clearTimeout(timeout);
+            delete window[callbackName];
+            if (script.parentNode) script.parentNode.removeChild(script);
+            resolve(data);
+          };
+
+          script.onerror = function () {
+            clearTimeout(timeout);
+            delete window[callbackName];
+            if (script.parentNode) script.parentNode.removeChild(script);
+            reject(new Error("Network error"));
+          };
+
+          script.src = GOOGLE_SCRIPT_URL + "?action=checkReg&regNo=" + encodeURIComponent(regNo) + "&callback=" + callbackName;
+          document.body.appendChild(script);
+        });
       }
+
+      verifyRegBtn.addEventListener("click", async function () {
+        var reg = modalRegInput.value.trim();
+        if (!reg) {
+          alert("Enter a Registration Number first.");
+          return;
+        }
+
+        verifyRegBtn.disabled = true;
+        verifyStatus.textContent = "Checking record in sheet...";
+        verifyStatus.className = "status-msg";
+
+        try {
+          var json = await checkRegJSONP(reg);
+
+          if (json && json.status === "found") {
+            verifiedData = json;
+            verifiedData.regNo = reg;
+            verifyStatus.textContent = "";
+            modalRegStep.classList.add("hidden");
+            modalUploadStep.classList.remove("hidden");
+
+            modalInfoBox.innerHTML =
+              "<strong>Verified:</strong> " + json.name + " (" + reg + ")<br>" +
+              "<strong>Allotted:</strong> " + json.group + " | " + json.set + "<br>" +
+              "<strong>Selected:</strong> " + json.selectedQuestions;
+
+            var qs = (json.selectedQuestions || "").split(",").map(function (q) { return q.trim(); });
+            if (qs.length >= 2) {
+              document.getElementById("label-file-1").textContent = "Solution for " + qs[0] + ":";
+              document.getElementById("label-file-2").textContent = "Solution for " + qs[1] + ":";
+            }
+          } else {
+            verifyStatus.textContent = "Registration Number not found or selection not saved yet.";
+            verifyStatus.className = "status-msg error";
+            verifyRegBtn.disabled = false;
+          }
+        } catch (err) {
+          console.error(err);
+          verifyStatus.textContent = "Error checking registration. Please retry.";
+          verifyStatus.className = "status-msg error";
+          verifyRegBtn.disabled = false;
+        }
+      });
+
+      function fileToBase64(file) {
+        return new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function () {
+            var rawBase64 = reader.result.split(",")[1];
+            resolve(rawBase64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function sendSingleFile(regNo, fileIndex, fileObj) {
+        return fileToBase64(fileObj).then(function (base64) {
+          var payload = {
+            action: "uploadSingleFile",
+            regNo: regNo,
+            fileIndex: fileIndex,
+            fileName: regNo + "_File" + fileIndex + "_" + fileObj.name,
+            mimeType: fileObj.type || "text/plain",
+            fileData: base64
+          };
+
+          return fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+        });
+      }
+
+      uploadFilesBtn.addEventListener("click", async function () {
+        var f1 = document.getElementById("file-input-1").files[0];
+        var f2 = document.getElementById("file-input-2").files[0];
+
+        if (!f1 || !f2) {
+          uploadStatus.textContent = "Please select both files.";
+          uploadStatus.className = "status-msg error";
+          return;
+        }
+
+        uploadFilesBtn.disabled = true;
+        uploadStatus.className = "status-msg";
+
+        try {
+          uploadStatus.textContent = "Uploading Question 1 solution...";
+          await sendSingleFile(verifiedData.regNo, 1, f1);
+
+          uploadStatus.textContent = "Uploading Question 2 solution...";
+          await sendSingleFile(verifiedData.regNo, 2, f2);
+
+          uploadStatus.textContent = "Both files uploaded! Check Columns G & H in your sheet.";
+          uploadStatus.className = "status-msg success";
+        } catch (err) {
+          console.error(err);
+          uploadStatus.textContent = "Upload failed. Please check network.";
+          uploadStatus.className = "status-msg error";
+          uploadFilesBtn.disabled = false;
+        }
+      });
     });
   </script>
 </body>
