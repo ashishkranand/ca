@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Java Practical Assignment Portal - CAP392</title>
+  <title>Java Practical Examination Portal - CAP392</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -43,8 +43,22 @@
 
     .top-bar {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 1rem;
+    }
+
+    .timer-badge {
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 700;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      border: 1px solid #fecaca;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
     .btn-upload-nav {
@@ -165,6 +179,15 @@
       color: #92400e;
     }
 
+    .alert-success {
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
     .empty-banner {
       background: #f1f5f9;
       border: 1px dashed var(--border);
@@ -216,30 +239,6 @@
       color: var(--primary);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1rem 0;
-      font-size: 0.9rem;
-    }
-
-    table,
-    th,
-    td {
-      border: 1px solid var(--border);
-    }
-
-    th,
-    td {
-      padding: 0.6rem;
-      text-align: left;
-    }
-
-    th {
-      background: var(--accent);
-      color: var(--text);
-    }
-
     .action-bar {
       margin-top: 1.5rem;
       display: flex;
@@ -262,13 +261,11 @@
       color: var(--error);
     }
 
+    /* Modal Overlay */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(15, 23, 42, 0.6);
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -279,11 +276,13 @@
     .modal-card {
       background: #fff;
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       border-radius: 12px;
       padding: 2rem;
       position: relative;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .close-btn {
@@ -297,29 +296,277 @@
       cursor: pointer;
       padding: 0;
     }
+
+    /* Examination Notepad Modal */
+    .modal-ide {
+      max-width: 1240px;
+      height: 92vh;
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem 1.5rem;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .modal-overlay.is-fullscreen {
+      padding: 0 !important;
+      z-index: 2147483647 !important;
+    }
+
+    .modal-ide.maximized {
+      max-width: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-height: 100vh !important;
+      border-radius: 0 !important;
+      padding: 1rem 1.5rem !important;
+      border: none !important;
+    }
+
+    .notepad-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .notepad-title-group h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .notepad-title-group p {
+      margin: 0;
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .notepad-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .notepad-timer-badge {
+      background: #ef4444;
+      color: #ffffff;
+      font-weight: 800;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      letter-spacing: 0.03em;
+      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    }
+
+    .notepad-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1rem;
+      flex: 1;
+      min-height: 0;
+      margin-top: 0.75rem;
+    }
+
+    .notepad-sidebar {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .code-editor-area {
+      display: flex;
+      flex-direction: column;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .editor-tabs-bar {
+      display: flex;
+      background: #0b1120;
+      border-bottom: 1px solid #1e293b;
+      overflow-x: auto;
+    }
+
+    .editor-tab {
+      padding: 0.6rem 1.2rem;
+      color: #94a3b8;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-right: 1px solid #1e293b;
+      white-space: nowrap;
+    }
+
+    .editor-tab.active {
+      background: #1e293b;
+      color: #60a5fa;
+      border-bottom: 2px solid #3b82f6;
+    }
+
+    .editor-sub-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+      background: #0f172a;
+      color: #94a3b8;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .java-textarea {
+      width: 100%;
+      flex: 1;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      padding: 1rem;
+      border: none;
+      outline: none;
+      resize: none;
+      tab-size: 4;
+    }
+
+    .theme-dark {
+      background: #020617;
+      color: #f8fafc;
+    }
+
+    .theme-dark .notepad-sidebar {
+      background: #0f172a;
+      border-color: #1e293b;
+      color: #f1f5f9;
+    }
+
+    .theme-dark .code-editor-area {
+      background: #0f172a;
+      border-color: #334155;
+    }
+
+    .theme-dark .java-textarea {
+      background: #090d16;
+      color: #f8fafc;
+    }
+
+    .theme-light {
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    .theme-light .notepad-sidebar {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .theme-light .editor-tabs-bar {
+      background: #e2e8f0;
+      border-bottom-color: #cbd5e1;
+    }
+
+    .theme-light .editor-tab {
+      color: #475569;
+      border-right-color: #cbd5e1;
+    }
+
+    .theme-light .editor-tab.active {
+      background: #ffffff;
+      color: #1d4ed8;
+      border-bottom-color: #2563eb;
+    }
+
+    .theme-light .editor-sub-bar {
+      background: #f1f5f9;
+      color: #64748b;
+      border-bottom-color: #e2e8f0;
+    }
+
+    .theme-light .code-editor-area {
+      background: #ffffff;
+      border-color: #cbd5e1;
+    }
+
+    .theme-light .java-textarea {
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    .btn-tool {
+      background: #334155;
+      color: #fff;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-tool:hover {
+      background: #475569;
+    }
+
+    .file-badge-link {
+      display: inline-block;
+      background: #2563eb;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin: 0.2rem 0.2rem 0.2rem 0;
+    }
+
+    .toast-popup {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #0f172a;
+      color: #fff;
+      padding: 0.85rem 1.4rem;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      z-index: 2147483647;
+      font-weight: 600;
+      border-left: 4px solid var(--success);
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
     <div class="top-bar">
+      <div id="live-timer-container" class="timer-badge hidden">
+        <span>⏱ Time Left:</span>
+        <span id="live-timer-text">40:00</span>
+      </div>
       <button type="button" id="open-upload-modal-btn" class="btn-upload-nav">Upload Files</button>
     </div>
 
     <!-- Step 1: Input Panel -->
     <div id="auth-panel" class="card">
       <div class="header-tag">COURSE CODE: CAP392</div>
-      <h1>Practical Assignment: Java</h1>
+      <h1>Practical Examination: Java</h1>
       <p>Select your assigned continuous evaluation task and verify your credentials.</p>
 
-      <!-- Displayed when NO CA is active/visible -->
       <div id="no-ca-banner" class="empty-banner hidden">
         <h3 style="color: var(--text); margin-bottom: 0.5rem;">No Assessment Allocated</h3>
         <p style="margin-bottom:0;">There are currently no active continuous assessment tasks scheduled for this period.
           Please check back later.</p>
       </div>
 
-      <!-- Displayed only when at least 1 CA is visible -->
       <div id="active-ca-form-content">
         <div class="form-group">
           <label for="student-ca-select">Select Assessment</label>
@@ -345,21 +592,9 @@
       <div class="header-tag" id="ca-inst-tag">COURSE CODE: CAP392</div>
       <h2 id="ca-inst-title">General Instructions &amp; Timing</h2>
 
-      <div class="alert-box">
-        <strong>Time Allowed:</strong> 40 minutes total (20 minutes per question).
-      </div>
+      <div id="ca-dynamic-instructions-container"></div>
 
-      <ul>
-        <li><strong>Attempt any TWO questions</strong> from your allocated set.</li>
-        <li><strong>Selection Requirement:</strong> You must check the boxes for the 2 questions you are attempting and
-          click <strong>Save Selection to Sheet</strong> to record your choices.</li>
-        <li><strong>Use multiple classes</strong> wherever specified in the problem statement.</li>
-        <li><strong>Dynamic Input:</strong> Take all required input from the user using <code>Scanner</code>.</li>
-        <li><strong>Control Structures:</strong> Implement the appropriate control logic (if-else, switch, loops).</li>
-        <li>After completion, click <strong>Upload Files</strong> at the top to upload your source code files directly
-          to Google Drive.</li>
-      </ul>
-      <button type="button" id="show-questions-btn">View My Allocated Set</button>
+      <button type="button" id="show-questions-btn" style="margin-top: 1rem;">View My Allocated Set</button>
     </div>
 
     <!-- Step 3: Questions Dashboard -->
@@ -374,25 +609,64 @@
           <span class="badge" id="display-set"></span>
         </div>
         <h2>Problem Statements</h2>
-        <p>Select <strong>exactly 2 questions</strong> below, then click "Save Selection to Sheet" to confirm.</p>
+        <p id="selection-guideline-text">Select your allocated questions below, then click "Confirm Selection &amp; Open
+          Notepad" to begin.</p>
       </div>
 
       <div id="dynamic-questions-container"></div>
 
       <div class="card action-bar">
-        <button type="button" id="save-selection-btn">Save Selection to Sheet</button>
+        <button type="button" id="save-selection-btn">Confirm Selection &amp; Open Notepad</button>
         <div id="status-display" class="status-msg"></div>
       </div>
     </div>
 
-    <!-- Upload Popup Modal -->
+    <!-- Step 4: Examination Notepad Modal (No Close '✕' button) -->
+    <div id="notepad-modal" class="modal-overlay hidden">
+      <div class="modal-card modal-ide theme-dark" id="notepad-card">
+        <div class="notepad-header">
+          <div class="notepad-title-group">
+            <h2>Examination Workspace</h2>
+            <p>Write your clean solutions below. External clipboard pasting is disabled.</p>
+          </div>
+
+          <div class="notepad-controls">
+            <div id="notepad-timer-display" class="notepad-timer-badge">
+              <span>⏱</span>
+              <span id="notepad-timer-clock">40:00</span>
+            </div>
+
+            <button type="button" id="toggle-theme-btn" class="btn-tool">☀ Light Mode</button>
+            <button type="button" id="toggle-maximize-btn" class="btn-tool">⛶ Maximize</button>
+            <button type="button" id="download-code-btn"
+              style="background:#059669; padding:0.5rem 1rem; font-size:0.88rem;">💾 Download .java</button>
+            <button type="button" id="save-cloud-code-btn"
+              style="background:#2563eb; padding:0.5rem 1rem; font-size:0.88rem;">✓ Save &amp; Submit Code</button>
+          </div>
+        </div>
+
+        <div class="notepad-grid">
+          <div class="notepad-sidebar" id="notepad-questions-view"></div>
+          <div class="code-editor-area">
+            <div class="editor-tabs-bar" id="editor-tabs-container"></div>
+            <div class="editor-sub-bar">
+              <span id="active-filename-display">Solution.java</span>
+              <span>Brace auto-pairing active &bull; Tab indentation enabled</span>
+            </div>
+            <textarea id="code-textarea" class="java-textarea" spellcheck="false"
+              placeholder="// Write your solution here..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload & Verification Modal -->
     <div id="upload-modal" class="modal-overlay hidden">
       <div class="modal-card">
         <button type="button" id="close-modal-btn" class="close-btn">&times;</button>
-        <h2>Upload Practical Submissions</h2>
-        <p>Verify your registration number before uploading solutions.</p>
+        <h2>Submission Status &amp; Upload</h2>
+        <p>Verify registration to view submission status or upload source files.</p>
 
-        <!-- Step A: Registration Check -->
         <div id="modal-reg-step">
           <div class="form-group">
             <label for="modal-ca-select">Assessment</label>
@@ -402,36 +676,57 @@
             <label for="modal-reg-input">Enter Registration Number</label>
             <input type="text" id="modal-reg-input" placeholder="e.g., 12109876" autocomplete="off" />
           </div>
-          <button type="button" id="verify-reg-btn">Verify Registration</button>
+          <button type="button" id="verify-reg-btn">Verify Status</button>
           <div id="verify-status" class="status-msg" style="margin-top: 0.75rem;"></div>
         </div>
 
-        <!-- Step B: Upload Inputs (Supports 1 or 2 files) -->
         <div id="modal-upload-step" class="hidden">
           <div class="alert-box" id="modal-info-box" style="margin-top: 1rem;"></div>
 
-          <div class="form-group">
-            <label id="label-file-1" for="file-input-1">Question 1 Solution:</label>
-            <input type="file" id="file-input-1" />
+          <!-- Already Submitted Details Box -->
+          <div id="already-submitted-box" class="alert-success hidden" style="margin-top: 1rem;">
+            <div style="font-size:1.05rem; font-weight:700; margin-bottom:0.35rem;" id="submission-headline">
+              Submission Received
+            </div>
+            <p style="margin-bottom:0.6rem; color:#14532d; font-size:0.88rem;" id="submission-subtext">
+              Your examination solutions have already been recorded and secured.
+            </p>
+            <div id="submission-links-area" style="margin-top: 0.5rem;"></div>
           </div>
 
-          <div class="form-group">
-            <label id="label-file-2" for="file-input-2">Question 2 Solution (Optional if submitting only 1):</label>
-            <input type="file" id="file-input-2" />
+          <!-- Active Upload Form (Shown only if not uploaded yet) -->
+          <div id="upload-form-wrapper" class="hidden">
+            <div id="dynamic-file-inputs-container"></div>
+            <button type="button" id="upload-files-btn">Upload to Google Drive</button>
           </div>
 
-          <button type="button" id="upload-files-btn">Upload to Google Drive</button>
           <div id="upload-status" class="status-msg" style="margin-top: 0.75rem;"></div>
         </div>
       </div>
     </div>
   </div>
 
+  <div id="toast" class="toast-popup hidden"></div>
+
   <script>
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOn2KROUEy9DIRk7xxvg_ZvwJ0QPvddjf2r9HkNGsyrdOB4LapoRhwE__vdRvo4F1T/exec";
 
     var caRegistry = {};
     var selectedCA = null;
+    var timerInterval = null;
+    var secondsRemaining = 2400;
+    var internalClipboardText = "";
+
+    // Multi-Question Code Storage Map
+    var studentCodeMap = {};
+    var activeQuestionCode = "";
+
+    function showToast(msg) {
+      var t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.remove("hidden");
+      setTimeout(function () { t.classList.add("hidden"); }, 3500);
+    }
 
     document.addEventListener("DOMContentLoaded", function () {
       var studentCaSelect = document.getElementById("student-ca-select");
@@ -447,6 +742,24 @@
       var saveBtn = document.getElementById("save-selection-btn");
       var statusDisplay = document.getElementById("status-display");
       var questionsContainer = document.getElementById("dynamic-questions-container");
+      var instructionsContainer = document.getElementById("ca-dynamic-instructions-container");
+      var selectionGuidelineText = document.getElementById("selection-guideline-text");
+
+      var notepadModal = document.getElementById("notepad-modal");
+      var notepadCard = document.getElementById("notepad-card");
+      var notepadQuestionsView = document.getElementById("notepad-questions-view");
+      var editorTabsContainer = document.getElementById("editor-tabs-container");
+      var activeFilenameDisplay = document.getElementById("active-filename-display");
+      var codeTextarea = document.getElementById("code-textarea");
+
+      var toggleThemeBtn = document.getElementById("toggle-theme-btn");
+      var toggleMaximizeBtn = document.getElementById("toggle-maximize-btn");
+      var downloadCodeBtn = document.getElementById("download-code-btn");
+      var saveCloudCodeBtn = document.getElementById("save-cloud-code-btn");
+
+      var liveTimerContainer = document.getElementById("live-timer-container");
+      var liveTimerText = document.getElementById("live-timer-text");
+      var notepadTimerClock = document.getElementById("notepad-timer-clock");
 
       var studentData = {
         caId: "CA1",
@@ -454,7 +767,10 @@
         regNo: "",
         setNumber: 1,
         groupName: "",
-        selectedQuestions: []
+        requiredCount: 1,
+        timerMinutes: 40,
+        selectedQuestions: [],
+        allocatedSet: null
       };
 
       function jsonp(url) {
@@ -472,7 +788,6 @@
       }
 
       async function initializeCAs() {
-        // Fetch only visible CAs for public page
         var res = await jsonp(GOOGLE_SCRIPT_URL + "?action=getAllCAs&publicOnly=true");
         studentCaSelect.innerHTML = "";
         modalCaSelect.innerHTML = "";
@@ -494,7 +809,6 @@
             modalCaSelect.appendChild(opt2);
           });
         } else {
-          // No visible CAs available: Hide input form entirely
           activeCaFormContent.classList.add("hidden");
           noCaBanner.classList.remove("hidden");
         }
@@ -530,8 +844,31 @@
         studentData.groupName = matchedSet.groupName;
         studentData.allocatedSet = matchedSet;
 
+        studentData.requiredCount = (selectedCA.requiredQuestions !== undefined && selectedCA.requiredQuestions !== null)
+          ? parseInt(selectedCA.requiredQuestions, 10)
+          : (parseInt(selectedCA.requiredQuestionsCount, 10) || 1);
+
+        studentData.timerMinutes = parseInt(selectedCA.timerMinutes, 10) || 40;
+
         document.getElementById("ca-inst-tag").textContent = "ASSESSMENT: " + caId;
         document.getElementById("ca-inst-title").textContent = selectedCA.name;
+
+        var dynamicInst = selectedCA.instructionsHtml || selectedCA.instructions;
+        if (dynamicInst && dynamicInst.trim()) {
+          instructionsContainer.innerHTML = dynamicInst;
+        } else {
+          instructionsContainer.innerHTML = `
+            <div class="alert-box">
+              <strong>Time Allowed:</strong> ${studentData.timerMinutes} minutes total.
+            </div>
+            <ul>
+              <li><strong>Attempt any ${studentData.requiredCount} question(s)</strong> from your allocated set.</li>
+              <li><strong>Selection Requirement:</strong> You must check the boxes for the ${studentData.requiredCount} question(s) you are attempting and click <strong>Confirm Selection</strong> to record your choices.</li>
+              <li><strong>Dynamic Input:</strong> Take all required input from the user using <code>Scanner</code>.</li>
+              <li>After completion, click <strong>Upload Files</strong> at the top to upload your source code files directly to Google Drive.</li>
+            </ul>
+          `;
+        }
 
         authPanel.classList.add("hidden");
         instructionsPanel.classList.remove("hidden");
@@ -546,6 +883,8 @@
         document.getElementById("display-reg").textContent = "Reg No: " + studentData.regNo;
         document.getElementById("display-group").textContent = studentData.groupName;
         document.getElementById("display-set").textContent = "Assigned: SET " + studentData.setNumber;
+
+        selectionGuidelineText.innerHTML = "Select <strong>exactly " + studentData.requiredCount + " question(s)</strong> below, then click \"Confirm Selection &amp; Open Notepad\" to begin.";
 
         questionsContainer.innerHTML = "";
         studentData.allocatedSet.questions.forEach(function (q) {
@@ -568,9 +907,9 @@
         checkboxes.forEach(function (cb) {
           cb.addEventListener("change", function () {
             var checked = questionsContainer.querySelectorAll(".q-checkbox:checked");
-            if (checked.length > 2) {
+            if (checked.length > studentData.requiredCount) {
               cb.checked = false;
-              alert("You can only select a maximum of 2 questions.");
+              alert("You can only select a maximum of " + studentData.requiredCount + " question(s).");
               return;
             }
             cb.closest(".question-card").classList.toggle("selected", cb.checked);
@@ -578,10 +917,251 @@
         });
       });
 
+      document.addEventListener("copy", function () {
+        var sel = window.getSelection().toString();
+        if (sel) internalClipboardText = sel;
+      });
+
+      codeTextarea.addEventListener("keydown", function (e) {
+        if (e.key === "Tab") {
+          e.preventDefault();
+          var start = this.selectionStart;
+          var end = this.selectionEnd;
+          this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+          this.selectionStart = this.selectionEnd = start + 4;
+        } else if (e.key === "{" || e.key === "(" || e.key === "[") {
+          e.preventDefault();
+          var pairs = { "{": "}", "(": ")", "[": "]" };
+          var openChar = e.key;
+          var closeChar = pairs[openChar];
+          var s = this.selectionStart;
+          var ed = this.selectionEnd;
+          this.value = this.value.substring(0, s) + openChar + closeChar + this.value.substring(ed);
+          this.selectionStart = this.selectionEnd = s + 1;
+        }
+      });
+
+      codeTextarea.addEventListener("input", function () {
+        if (activeQuestionCode) {
+          studentCodeMap[activeQuestionCode] = this.value;
+        }
+      });
+
+      codeTextarea.addEventListener("paste", function (e) {
+        e.preventDefault();
+        var clipboardData = (e.clipboardData || window.clipboardData).getData("text");
+        if (clipboardData === internalClipboardText) {
+          var s = this.selectionStart;
+          var ed = this.selectionEnd;
+          this.value = this.value.substring(0, s) + clipboardData + this.value.substring(ed);
+          this.selectionStart = this.selectionEnd = s + clipboardData.length;
+          if (activeQuestionCode) studentCodeMap[activeQuestionCode] = this.value;
+        } else {
+          alert("External pasting is restricted! You can only copy content from this examination portal.");
+        }
+      });
+
+      toggleThemeBtn.addEventListener("click", function () {
+        if (notepadCard.classList.contains("theme-dark")) {
+          notepadCard.classList.remove("theme-dark");
+          notepadCard.classList.add("theme-light");
+          this.textContent = "🌙 Dark Mode";
+        } else {
+          notepadCard.classList.remove("theme-light");
+          notepadCard.classList.add("theme-dark");
+          this.textContent = "☀ Light Mode";
+        }
+      });
+
+      toggleMaximizeBtn.addEventListener("click", function () {
+        var isCurrentlyFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+        if (!isCurrentlyFullscreen) {
+          var el = document.documentElement;
+          var requestMethod = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+          if (requestMethod) {
+            requestMethod.call(el);
+          }
+          notepadCard.classList.add("maximized");
+          notepadModal.classList.add("is-fullscreen");
+          this.textContent = "🗗 Minimize";
+        } else {
+          var exitMethod = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+          if (exitMethod) {
+            exitMethod.call(document);
+          }
+          notepadCard.classList.remove("maximized");
+          notepadModal.classList.remove("is-fullscreen");
+          this.textContent = "⛶ Maximize";
+        }
+      });
+
+      document.addEventListener("fullscreenchange", function () {
+        if (!document.fullscreenElement) {
+          notepadCard.classList.remove("maximized");
+          notepadModal.classList.remove("is-fullscreen");
+          toggleMaximizeBtn.textContent = "⛶ Maximize";
+        }
+      });
+
+      function switchEditorTab(qCode) {
+        if (activeQuestionCode) {
+          studentCodeMap[activeQuestionCode] = codeTextarea.value;
+        }
+        activeQuestionCode = qCode;
+        activeFilenameDisplay.textContent = qCode + "_Solution.java";
+
+        var tabs = editorTabsContainer.querySelectorAll(".editor-tab");
+        tabs.forEach(function (t) {
+          t.classList.toggle("active", t.dataset.q === qCode);
+        });
+
+        codeTextarea.value = studentCodeMap[qCode] || (
+          "// Solution for " + qCode + "\n" +
+          "import java.util.Scanner;\n\n" +
+          "public class " + qCode + "_Solution {\n" +
+          "    public static void main(String[] args) {\n" +
+          "        Scanner sc = new Scanner(System.in);\n" +
+          "        // Write solution logic here\n" +
+          "    }\n" +
+          "}"
+        );
+      }
+
+      function startExamTimer(minutes) {
+        if (timerInterval) clearInterval(timerInterval);
+        secondsRemaining = minutes * 60;
+        liveTimerContainer.classList.remove("hidden");
+
+        timerInterval = setInterval(function () {
+          secondsRemaining--;
+          var m = Math.floor(secondsRemaining / 60);
+          var s = secondsRemaining % 60;
+          var formattedTime = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+
+          liveTimerText.textContent = formattedTime;
+          if (notepadTimerClock) {
+            notepadTimerClock.textContent = formattedTime;
+          }
+
+          if (secondsRemaining <= 0) {
+            clearInterval(timerInterval);
+            handleAutoSubmit();
+          }
+        }, 1000);
+      }
+
+      function triggerSingleFileDownload(filename, content) {
+        var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
+      function downloadCodeFileOffline(isAuto) {
+        if (activeQuestionCode) {
+          studentCodeMap[activeQuestionCode] = codeTextarea.value;
+        }
+
+        var selected = studentData.selectedQuestions;
+        if (selected.length === 0) selected = ["Q1"];
+
+        selected.forEach(function (qCode, idx) {
+          var code = studentCodeMap[qCode] || "// No code entered for " + qCode;
+          var fileName = (studentData.regNo || "Student") + "_" + studentData.caId + "_" + qCode + ".java";
+          setTimeout(function () {
+            triggerSingleFileDownload(fileName, code);
+          }, idx * 250);
+        });
+
+        if (isAuto) {
+          alert("Time's up! Your solutions have been auto-submitted and saved to your computer.");
+        } else {
+          showToast("Downloaded .java file(s) successfully!");
+        }
+      }
+
+      downloadCodeBtn.addEventListener("click", function () { downloadCodeFileOffline(false); });
+
+      function consolidateAllCode() {
+        if (activeQuestionCode) {
+          studentCodeMap[activeQuestionCode] = codeTextarea.value;
+        }
+        var fullText = "";
+        studentData.selectedQuestions.forEach(function (qCode) {
+          fullText += "/* ==================== SOLUTION FOR " + qCode + " ==================== */\n\n";
+          fullText += (studentCodeMap[qCode] || "// Empty solution") + "\n\n";
+        });
+        return fullText.trim();
+      }
+
+      async function saveCodeToSheetCloud(isAuto) {
+        if (activeQuestionCode) {
+          studentCodeMap[activeQuestionCode] = codeTextarea.value;
+        }
+
+        var content = consolidateAllCode();
+        saveCloudCodeBtn.disabled = true;
+        saveCloudCodeBtn.textContent = "Saving...";
+
+        var payload = {
+          action: "saveStudentCode",
+          caId: studentData.caId,
+          regNo: studentData.regNo,
+          codeContent: content,
+          codeFiles: studentCodeMap,
+          isAuto: isAuto
+        };
+
+        try {
+          await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+
+          downloadCodeFileOffline(isAuto);
+          showToast("Solution submitted and synchronized successfully!");
+
+          setTimeout(function () {
+            if (document.fullscreenElement) {
+              document.exitFullscreen().catch(function () { });
+            }
+            notepadModal.classList.add("hidden");
+            statusDisplay.textContent = "Examination completed & saved to cloud records.";
+            statusDisplay.className = "status-msg success";
+          }, 800);
+        } catch (err) {
+          alert("Network issue saving to cloud records. Downloaded .java files locally.");
+          downloadCodeFileOffline(isAuto);
+        } finally {
+          saveCloudCodeBtn.disabled = false;
+          saveCloudCodeBtn.textContent = "✓ Save & Submit Code";
+        }
+      }
+
+      saveCloudCodeBtn.addEventListener("click", function () {
+        if (confirm("Are you sure you want to save and submit your solutions? The notepad will close.")) {
+          saveCodeToSheetCloud(false);
+        }
+      });
+
+      async function handleAutoSubmit() {
+        codeTextarea.readOnly = true;
+        await saveCodeToSheetCloud(true);
+      }
+
       saveBtn.addEventListener("click", async function () {
         var checkedBoxes = questionsContainer.querySelectorAll(".q-checkbox:checked");
-        if (checkedBoxes.length !== 2) {
-          statusDisplay.textContent = "Please select exactly 2 questions.";
+        if (checkedBoxes.length !== studentData.requiredCount) {
+          alert("Please select exactly " + studentData.requiredCount + " question(s).");
+          statusDisplay.textContent = "Please select exactly " + studentData.requiredCount + " question(s).";
           statusDisplay.className = "status-msg error";
           return;
         }
@@ -590,7 +1170,7 @@
         studentData.selectedQuestions = selectedQuestions;
 
         saveBtn.disabled = true;
-        statusDisplay.textContent = "Saving to Google Sheet...";
+        statusDisplay.textContent = "Saving selection & initializing workspace...";
         statusDisplay.className = "status-msg";
 
         var payload = {
@@ -612,9 +1192,49 @@
             body: JSON.stringify(payload)
           });
 
-          statusDisplay.textContent = "Selection saved successfully! Proceed to upload when finished.";
+          statusDisplay.textContent = "Selection confirmed! Examination started.";
           statusDisplay.className = "status-msg success";
           questionsContainer.querySelectorAll(".q-checkbox").forEach(function (cb) { cb.disabled = true; });
+
+          notepadQuestionsView.innerHTML = "<h3 style='margin-bottom:0.75rem; color:var(--primary); font-size:1.05rem;'>Allocated Problem(s)</h3>";
+          studentData.allocatedSet.questions.forEach(function (q) {
+            if (studentData.selectedQuestions.indexOf(q.code) !== -1) {
+              var qItem = document.createElement("div");
+              qItem.style.cssText = "background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:6px; padding:0.85rem; margin-bottom:0.85rem;";
+              qItem.innerHTML = "<h4 style='color:var(--primary); margin-bottom:0.4rem;'>" + q.code + ". " + q.title + "</h4>" + q.html;
+              notepadQuestionsView.appendChild(qItem);
+            }
+          });
+
+          editorTabsContainer.innerHTML = "";
+          studentCodeMap = {};
+
+          studentData.selectedQuestions.forEach(function (qCode, idx) {
+            var tabBtn = document.createElement("button");
+            tabBtn.type = "button";
+            tabBtn.className = "editor-tab" + (idx === 0 ? " active" : "");
+            tabBtn.dataset.q = qCode;
+            tabBtn.textContent = qCode + ".java";
+            tabBtn.addEventListener("click", function () {
+              switchEditorTab(qCode);
+            });
+            editorTabsContainer.appendChild(tabBtn);
+
+            studentCodeMap[qCode] =
+              "// Solution for " + qCode + "\n" +
+              "import java.util.Scanner;\n\n" +
+              "public class " + qCode + "_Solution {\n" +
+              "    public static void main(String[] args) {\n" +
+              "        Scanner sc = new Scanner(System.in);\n" +
+              "        // Write solution logic here\n" +
+              "    }\n" +
+              "}";
+          });
+
+          switchEditorTab(studentData.selectedQuestions[0]);
+          notepadModal.classList.remove("hidden");
+          startExamTimer(studentData.timerMinutes);
+
         } catch (err) {
           statusDisplay.textContent = "Error saving. Please check network.";
           statusDisplay.className = "status-msg error";
@@ -622,7 +1242,7 @@
         }
       });
 
-      // --- Upload Modal Logic ---
+      // --- Upload & Verification Modal Logic ---
       var uploadModal = document.getElementById("upload-modal");
       var openModalBtn = document.getElementById("open-upload-modal-btn");
       var closeModalBtn = document.getElementById("close-modal-btn");
@@ -632,6 +1252,12 @@
       var modalRegInput = document.getElementById("modal-reg-input");
       var verifyStatus = document.getElementById("verify-status");
       var modalInfoBox = document.getElementById("modal-info-box");
+      var uploadFormWrapper = document.getElementById("upload-form-wrapper");
+      var alreadySubmittedBox = document.getElementById("already-submitted-box");
+      var submissionHeadline = document.getElementById("submission-headline");
+      var submissionSubtext = document.getElementById("submission-subtext");
+      var submissionLinksArea = document.getElementById("submission-links-area");
+      var dynamicFileInputsContainer = document.getElementById("dynamic-file-inputs-container");
       var uploadFilesBtn = document.getElementById("upload-files-btn");
       var uploadStatus = document.getElementById("upload-status");
 
@@ -645,6 +1271,17 @@
 
       closeModalBtn.addEventListener("click", function () { uploadModal.classList.add("hidden"); });
 
+      window.viewCandidateSubmittedCode = function () {
+        if (!verifiedData || !verifiedData.submittedCode) {
+          alert("No code content recorded.");
+          return;
+        }
+        var win = window.open("", "_blank");
+        win.document.write("<pre style='font-family:Consolas,monospace;padding:20px;background:#1e293b;color:#f8fafc;border-radius:8px;font-size:14px;white-space:pre-wrap;'>" +
+          verifiedData.submittedCode.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") +
+          "</pre>");
+      };
+
       verifyRegBtn.addEventListener("click", async function () {
         var reg = modalRegInput.value.trim();
         var caId = modalCaSelect.value;
@@ -654,7 +1291,7 @@
         }
 
         verifyRegBtn.disabled = true;
-        verifyStatus.textContent = "Checking record in sheet...";
+        verifyStatus.textContent = "Checking records...";
         verifyStatus.className = "status-msg";
 
         try {
@@ -673,13 +1310,61 @@
               "<strong>Assessment:</strong> " + caId + " | " + json.group + " | " + json.set + "<br>" +
               "<strong>Selected:</strong> " + json.selectedQuestions;
 
-            var qs = (json.selectedQuestions || "").split(",").map(function (q) { return q.trim(); });
-            if (qs.length >= 2) {
-              document.getElementById("label-file-1").textContent = "Solution for " + qs[0] + ":";
-              document.getElementById("label-file-2").textContent = "Solution for " + qs[1] + " (Optional if single file):";
+            // Student has submitted (either automatically or manually)
+            if (json.hasUploaded) {
+              uploadFormWrapper.classList.add("hidden");
+              alreadySubmittedBox.classList.remove("hidden");
+
+              if (json.isAutoSubmitted) {
+                submissionHeadline.textContent = "⏱ Submission Auto-Completed";
+                submissionSubtext.textContent = "Your time elapsed. Solution code was automatically submitted and synchronized to cloud records.";
+              } else {
+                submissionHeadline.textContent = "✓ Submission Completed";
+                submissionSubtext.textContent = "Your examination solutions have been received and verified.";
+              }
+
+              var linksHtml = "<div style='font-weight:600;font-size:0.85rem;margin-bottom:0.4rem;color:#1e3a8a;'>Recorded Work:</div>";
+              if (json.hasCode) {
+                linksHtml += '<button type="button" class="btn-tool" style="background:#2563eb;font-size:0.8rem;padding:0.35rem 0.75rem;margin-right:0.4rem;" onclick="viewCandidateSubmittedCode()">📄 View Saved Code</button>';
+              }
+              if (json.file1Url) {
+                linksHtml += '<a class="file-badge-link" href="' + json.file1Url + '" target="_blank">File 1 ↗</a>';
+              }
+              if (json.file2Url) {
+                linksHtml += '<a class="file-badge-link" href="' + json.file2Url + '" target="_blank">File 2 ↗</a>';
+              }
+
+              submissionLinksArea.innerHTML = linksHtml;
+              uploadStatus.textContent = "";
+              return;
             }
+
+            // Student has not submitted yet: show upload form
+            alreadySubmittedBox.classList.add("hidden");
+            uploadFormWrapper.classList.remove("hidden");
+            uploadStatus.textContent = "";
+
+            var qs = (json.selectedQuestions || "")
+              .split(",")
+              .map(function (q) { return q.trim(); })
+              .filter(function (q) { return q.length > 0; });
+
+            dynamicFileInputsContainer.innerHTML = "";
+            if (qs.length === 0) qs = ["Question 1"];
+
+            qs.forEach(function (qName, idx) {
+              var fIndex = idx + 1;
+              var fg = document.createElement("div");
+              fg.className = "form-group";
+              fg.innerHTML = `
+                <label for="file-input-${fIndex}">Solution for ${qName}:</label>
+                <input type="file" id="file-input-${fIndex}" data-file-index="${fIndex}" data-qname="${qName}" />
+              `;
+              dynamicFileInputsContainer.appendChild(fg);
+            });
+
           } else {
-            verifyStatus.textContent = "Registration Number not found in " + caId + " or selection not saved.";
+            verifyStatus.textContent = "Registration Number not found in " + caId + " or selection not confirmed.";
             verifyStatus.className = "status-msg error";
             verifyRegBtn.disabled = false;
           }
@@ -693,9 +1378,7 @@
       function fileToBase64(file) {
         return new Promise(function (resolve, reject) {
           var reader = new FileReader();
-          reader.onload = function () {
-            resolve(reader.result.split(",")[1]);
-          };
+          reader.onload = function () { resolve(reader.result.split(",")[1]); };
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
@@ -722,12 +1405,14 @@
         });
       }
 
-      // Supports uploading either 1 file or both files seamlessly
       uploadFilesBtn.addEventListener("click", async function () {
-        var f1 = document.getElementById("file-input-1").files[0];
-        var f2 = document.getElementById("file-input-2").files[0];
+        var fileInputs = dynamicFileInputsContainer.querySelectorAll("input[type='file']");
+        var hasAtLeastOne = false;
+        fileInputs.forEach(function (inp) {
+          if (inp.files && inp.files[0]) hasAtLeastOne = true;
+        });
 
-        if (!f1 && !f2) {
+        if (!hasAtLeastOne) {
           uploadStatus.textContent = "Please select at least one file to upload.";
           uploadStatus.className = "status-msg error";
           return;
@@ -737,17 +1422,21 @@
         uploadStatus.className = "status-msg";
 
         try {
-          if (f1) {
-            uploadStatus.textContent = "Uploading File 1...";
-            await sendSingleFile(verifiedData.caId, verifiedData.regNo, 1, f1);
-          }
-          if (f2) {
-            uploadStatus.textContent = "Uploading File 2...";
-            await sendSingleFile(verifiedData.caId, verifiedData.regNo, 2, f2);
+          for (var i = 0; i < fileInputs.length; i++) {
+            var input = fileInputs[i];
+            if (input.files && input.files[0]) {
+              var fIndex = input.getAttribute("data-file-index");
+              uploadStatus.textContent = "Uploading File " + fIndex + "...";
+              await sendSingleFile(verifiedData.caId, verifiedData.regNo, fIndex, input.files[0]);
+            }
           }
 
-          uploadStatus.textContent = "Submission successfully uploaded! Check your sheet tab " + verifiedData.caId + ".";
-          uploadStatus.className = "status-msg success";
+          uploadFormWrapper.classList.add("hidden");
+          alreadySubmittedBox.classList.remove("hidden");
+          submissionHeadline.textContent = "✓ Submission Successful";
+          submissionSubtext.textContent = "Your source code files have been uploaded directly to cloud records.";
+          submissionLinksArea.innerHTML = "";
+          uploadStatus.textContent = "";
         } catch (err) {
           uploadStatus.textContent = "Upload failed. Please check network.";
           uploadStatus.className = "status-msg error";
